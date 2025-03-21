@@ -22,7 +22,14 @@ Fit-AI leverages AI technology to offer personalized fitness advice, track progr
 
 Check out the live demo [here](#) (link to be updated).
 
-![Screenshot 1](#) ![Screenshot 2](#) ![Screenshot 3](#)
+
+![Screenshot 2025-03-21 204926](https://github.com/user-attachments/assets/9788813f-f2ba-40cc-a807-49c8b0f95993)
+![Screenshot 2025-03-21 204951](https://github.com/user-attachments/assets/02f83546-d240-4596-addd-c5ddfff8465e)
+![Screenshot 2025-03-21 205011](https://github.com/user-attachments/assets/feac95df-9935-411e-a803-983c545fa77c)
+![Screenshot 2025-03-21 205025](https://github.com/user-attachments/assets/3615019b-a572-4685-a523-7b6433b906d2)
+
+
+
 
 Explore the code repository [here](https://github.com/sakshamm0507/Fit-AI).
 
