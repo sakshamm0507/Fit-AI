@@ -20,7 +20,7 @@ Fit-AI leverages AI technology to offer personalized fitness advice, track progr
 
 ## Demo
 
-Check out the live demo [here](#) (link to be updated).
+Check out the live demo https://fitai-plum.vercel.app/
 
 
 ![Screenshot 2025-03-21 204926](https://github.com/user-attachments/assets/9788813f-f2ba-40cc-a807-49c8b0f95993)
