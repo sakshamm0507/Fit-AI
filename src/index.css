@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --app-bg: #050813;
+}
+
+@layer base {
+  body {
+    @apply bg-white dark:bg-dark-100 text-gray-900 dark:text-white font-sans antialiased;
+    min-height: 100vh;
+  }
+
+  .dark body {
+    background: var(--app-bg);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl leading-tight;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl leading-tight;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl leading-tight;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+
+  .btn-secondary {
+    @apply bg-dark-500 text-white hover:bg-dark-600 focus:ring-dark-400;
+  }
+
+  .card {
+    @apply bg-white dark:bg-dark-300 rounded-lg p-6 transition-all;
+  }
+
+  .card-hover {
+    @apply hover:shadow-glow hover:-translate-y-1;
+  }
+
+  .glow-effect {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+  }
+
+  .nav-link {
+    @apply text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors relative;
+  }
+
+  .nav-link.active {
+    @apply text-primary-500 font-medium;
+  }
+
+  .nav-link.active::after {
+    content: '';
+    @apply absolute bottom-[-4px] left-0 w-full h-[2px] bg-primary-500;
+  }
+
+  .feature-card {
+    @apply bg-white dark:bg-dark-300 rounded-xl p-6 transition-all duration-300 shadow-md hover:shadow-glow;
+  }
+
+  .icon-circle {
+    @apply flex items-center justify-center w-16 h-16 rounded-full;
+  }
+}
+
+.chatbox-gradient {
+  background: linear-gradient(180deg, rgba(11, 20, 45, 0.8) 0%, rgba(11, 20, 45, 0.9) 100%);
+  backdrop-filter: blur(10px);
+}
+
+.fitness-bg {
+  background-image: radial-gradient(circle at 10% 50%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 90% 20%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-dark-300;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-dark-600 rounded-full hover:bg-gray-400 dark:hover:bg-dark-500;
+}

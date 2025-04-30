@@ -1,0 +1,8 @@
+fastapi==0.109.2
+uvicorn==0.27.1
+google-generativeai==0.3.2
+pydantic==2.6.1
+python-dotenv==1.0.1
+typing-extensions==4.8.0
+asyncio==3.4.3
+uuid==1.30
