@@ -38,7 +38,7 @@ Fit-AI creates personalized workout plans based on your fitness level, available
 
 ## Demo
 
-Try out the live demo of Fit-AI: [FIT AI](https://www.fitai.app)
+Try out the live demo of Fit-AI: [FIT AI]([https://www.fitai.app](https://fit-ai-pi.vercel.app/))
 
 ## Installation
 
@@ -91,13 +91,6 @@ The application uses Google's Gemini API for generating workout plans. To config
 1. Obtain an API key from [Google AI Studio](https://ai.google.dev/)
 2. Add your key to the .env file as shown above
 3. The backend will automatically load this key when starting
-
-## Screenshots
-
-![User Profile Form](https://github.com/user-attachments/assets/9788813f-f2ba-40cc-a807-49c8b0f95993)
-![Workout Plan Generation](https://github.com/user-attachments/assets/02f83546-d240-4596-addd-c5ddfff8465e)
-![Personalized Routine](https://github.com/user-attachments/assets/feac95df-9935-411e-a803-983c545fa77c)
-![Progress Tracking](https://github.com/user-attachments/assets/3615019b-a572-4685-a523-7b6433b906d2)
 
 ## License
 
