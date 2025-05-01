@@ -102,3 +102,54 @@
 ::-webkit-scrollbar-thumb {
   @apply bg-gray-300 dark:bg-dark-600 rounded-full hover:bg-gray-400 dark:hover:bg-dark-500;
 }
+
+/* Markdown content styling */
+.markdown-content h1 {
+  @apply text-2xl font-bold my-3 text-primary-400;
+}
+
+.markdown-content h2 {
+  @apply text-xl font-semibold my-2 text-primary-300;
+}
+
+.markdown-content h3 {
+  @apply text-lg font-medium my-2;
+}
+
+.markdown-content ul {
+  @apply list-disc pl-5 my-2;
+}
+
+.markdown-content ol {
+  @apply list-decimal pl-5 my-2;
+}
+
+.markdown-content li {
+  @apply my-1;
+}
+
+.markdown-content p {
+  @apply my-2;
+}
+
+.markdown-content strong, 
+.markdown-content b {
+  @apply font-bold text-primary-300;
+}
+
+.markdown-content em, 
+.markdown-content i {
+  @apply italic;
+}
+
+.markdown-content a {
+  @apply text-primary-400 underline hover:text-primary-300;
+}
+
+.markdown-content code {
+  @apply bg-dark-600 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.markdown-content pre {
+  @apply bg-dark-600 p-3 rounded my-2 overflow-x-auto;
+}

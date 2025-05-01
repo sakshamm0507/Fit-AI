@@ -41,7 +41,7 @@ genai.configure(api_key=API_KEY)  # Configure will raise its own error if needed
 
 # Create the model with safer settings
 generation_config = {
-    "temperature": 2.0,  
+    "temperature": 1.5,  
     "top_p": 0.95,
     "top_k": 64,
     "max_output_tokens": 4096,  
@@ -50,7 +50,28 @@ generation_config = {
 
 model = genai.GenerativeModel(
     model_name="gemini-2.5-flash-preview-04-17", 
-    system_instruction="You are a helpful fitness expert creating workout plans. Be clear, specific and professional. Always provide your response in a structured format with sections for Warm-up, Main Workout, and Cool-down. Use markdown formatting with appropriate headers, lists, and formatting.",
+    system_instruction="""You are a helpful fitness expert creating workout plans. Be clear, specific and professional.You are a helpful fitness expert creating workout plans. Be clear, specific and professional. Always provide your response in a structured format with sections for Warm-up, Main Workout, and Cool-down.
+      Give proper workouts for the user based on the data provided in the prompt.Provide different exercises for each day of the week. Include sets, reps, and focus areas for each exercise and include a warm-up and cool-down section and and make tables and bullet points for easy readability. and add a summary of the workout at the end and add a note about the importance of hydration and nutrition, add a note about the importance of rest and recovery, and add a note about the importance of proper form and technique. Always provide your response in a structured format with sections for Warm-up, Main Workout, and Cool-down.
+      also add the calories burnt per exercise and the total calories burnt for the workout. Always provide your response in a structured format with sections for Warm-up, Main Workout, and Cool-down.
+      Always provide your response in a structured format with sections for Warm-up, Main Workout, and Cool-down.
+    
+Always structure your response with the following markdown sections:
+# Workout Plan for [User]
+## Workout Frequency
+[Details about frequency]
+## 1. Warm-up
+* [Exercise 1]: [Details]
+* [Exercise 2]: [Details]
+## 2. Main Workout
+* **[Exercise Name]**:
+  * **Sets**: [number]
+  * **Reps**: [number]
+  * **Focus**: [description]
+## 3. Cool-down
+* [Stretch 1]: [Details]
+* [Stretch 2]: [Details]
+
+Make sure to use proper markdown with headers (#, ##), bullet points (*), and text formatting (**bold**, *italic*) consistently.""",
     generation_config=generation_config
 )
 
@@ -74,46 +95,30 @@ class ChatMessage(BaseModel):
     session_id: str
     message: str
 
-async def stream_response(content, word_delay=0.03, paragraph_delay=0.5):
-    """Stream response with simulated typing effect"""
+async def stream_response(content, paragraph_delay=0.3):
+    """Stream response with properly preserved markdown formatting"""
     # Add typing indicator
     yield "⏳ Thinking...\n\n"
     await asyncio.sleep(1.5)
     
-    # Process and format the content
-    paragraphs = re.split(r'\n\n+', content)
+    # Better preservation of markdown structure
+    # Split by line instead of paragraphs to maintain list items and headers
+    lines = content.split('\n')
     
-    for i, paragraph in enumerate(paragraphs):
-        # Check if paragraph is a header (starts with #)
-        is_header = paragraph.lstrip().startswith('#')
+    current_block = []
+    for line in lines:
+        current_block.append(line)
         
-        # Split paragraph into words
-        words = paragraph.split()
-        
-        for j, word in enumerate(words):
-            yield word + " "
-            
-            # Random slight variation in typing speed
-            typing_delay = word_delay * (0.8 + 0.4 * (hash(word) % 10) / 10)
-            await asyncio.sleep(typing_delay)
-            
-            # Add a brief pause after punctuation
-            if word.endswith(('.', '!', '?', ':', ';')):
-                await asyncio.sleep(word_delay * 3)
-        
-        # Add proper newlines between paragraphs
-        if i < len(paragraphs) - 1:
-            if is_header:
-                # For headers, add double line break
-                yield "\n\n"
-            else:
-                # For regular paragraphs, ensure double line break
-                yield "\n\n"
-            
-            await asyncio.sleep(paragraph_delay)
-        else:
-            # Last paragraph still needs a line break
-            yield "\n"
+        # Send blocks of related content together (headers with content, list items, etc.)
+        if not line.strip() or line.startswith('#'):
+            if current_block:
+                yield '\n'.join(current_block) + '\n'
+                current_block = []
+                await asyncio.sleep(paragraph_delay)
+    
+    # Send any remaining content
+    if current_block:
+        yield '\n'.join(current_block)
 
 # Key functions to fix
 import asyncio
@@ -150,16 +155,35 @@ async def start_chat(profile: UserProfile, request: Request):
             {"role": "model", "parts": [direct_response.text]}
         ])
         
-        # Return non-streaming response for now
+        # Return response with proper content type
         return {
             "session_id": session_id,
-            "response": direct_response.text
+            "response": direct_response.text,
+            "content_type": "text/markdown"
         }
         
     except Exception as e:
         error_message = str(e)
         logger.error(f"Error in start_chat: {error_message}")
         raise HTTPException(status_code=500, detail=error_message)
+
+def ensure_markdown_structure(text):
+    """Ensure the text has proper markdown structure with line breaks"""
+    # Fix common formatting issues
+    
+    # Make sure header lines start with proper spacing
+    text = re.sub(r'([^\n])(\#{1,3}\s)', r'\1\n\2', text)
+    
+    # Ensure bullet points have proper spacing
+    text = re.sub(r'([^\n])(\*\s)', r'\1\n\2', text)
+    
+    # Add extra newline after headers for better readability
+    text = re.sub(r'(\#{1,3}.*?)(\n)(?!\n)', r'\1\n\n', text)
+    
+    # Add newline before and after list sections
+    text = re.sub(r'(\n\*\s.*?)(\n)(?!\*|\n)', r'\1\n\n', text)
+    
+    return text
 
 @app.post("/api/chat")
 async def chat(message: ChatMessage):
@@ -173,12 +197,15 @@ async def chat(message: ChatMessage):
         response = chat_session.send_message(message.message)
         logger.info("Response received from model")
         
-        # Return streaming response
+        # Pre-process to ensure markdown structure
+        formatted_text = ensure_markdown_structure(response.text)
+        
+        # Return streaming response with proper content type
         async def response_generator():
-            async for chunk in stream_response(response.text):
+            async for chunk in stream_response(formatted_text):
                 yield chunk
         
-        return StreamingResponse(response_generator(), media_type="text/plain")
+        return StreamingResponse(response_generator(), media_type="text/markdown")
     except Exception as e:
         logger.error(f"Error in chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

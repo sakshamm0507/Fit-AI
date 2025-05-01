@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Bot, Send, X, Minimize, Maximize } from 'lucide-react';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import PageTransition from '../components/ui/PageTransition';
 import SectionHeading from '../components/ui/SectionHeading';
-import Button from '../components/ui/Button';
 
 interface Message {
   id: string;
@@ -256,7 +257,27 @@ const Chat = () => {
                           : 'bg-dark-500 text-white'
                       }`}
                     >
-                      {message.content}
+                      {message.type === 'user' ? (
+                        message.content
+                      ) : (
+                        <div className="markdown-content">
+                          <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              h1: ({node, ...props}) => <h1 className="text-xl font-bold my-2" {...props} />,
+                              h2: ({node, ...props}) => <h2 className="text-lg font-semibold my-2" {...props} />,
+                              h3: ({node, ...props}) => <h3 className="text-md font-medium my-1" {...props} />,
+                              ul: ({node, ...props}) => <ul className="list-disc pl-5 my-2" {...props} />,
+                              ol: ({node, ...props}) => <ol className="list-decimal pl-5 my-2" {...props} />,
+                              li: ({node, ...props}) => <li className="my-1" {...props} />,
+                              p: ({node, ...props}) => <p className="my-2" {...props} />,
+                              strong: ({node, ...props}) => <strong className="font-bold text-primary-300" {...props} />
+                            }}
+                          >
+                            {message.content}
+                          </ReactMarkdown>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
