@@ -10,6 +10,7 @@ from fastapi.responses import StreamingResponse
 import google.generativeai as genai
 from dotenv import load_dotenv
 import logging
+from google import genai
 from google.genai import types
 import re
 
