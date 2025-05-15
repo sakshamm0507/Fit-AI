@@ -129,7 +129,7 @@ const Chat = () => {
   const startChat = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.post('http://localhost:8000/api/start-chat', profile);
+      const response = await axios.post('https://fit-ai-43u0.onrender.com/api/start-chat', profile);
       setSessionId(response.data.session_id);
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
@@ -174,7 +174,7 @@ const Chat = () => {
     } else if (sessionId) {
       try {
         setIsLoading(true);
-        const response = await axios.post('http://localhost:8000/api/chat', {
+        const response = await axios.post('https://fit-ai-43u0.onrender.com/api/chat', {
           session_id: sessionId,
           message: inputValue
         });
