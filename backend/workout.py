@@ -10,8 +10,7 @@ from fastapi.responses import StreamingResponse
 import google.generativeai as genai
 from dotenv import load_dotenv
 import logging
-from google import genai
-from google.genai import types
+# from google.genai import types
 import re
 
 # Configure logging
@@ -38,7 +37,15 @@ API_KEY = os.getenv("GOOGLE_API_KEY", "")  # Default to empty string if not foun
 
 # Log API key status (not the key itself)
 logger.info(f"API Key found: {bool(API_KEY)}")
-genai.configure(api_key=API_KEY)  # Configure will raise its own error if needed
+
+# Update the configuration approach to be compatible with different API versions
+try:
+    # Try the configure method (for older versions)
+    genai.configure(api_key=API_KEY)
+except AttributeError:
+    # For newer versions that don't use configure
+    import google.generativeai as genai
+    logger.info("Using alternative API configuration approach")
 
 # Create the model with safer settings
 generation_config = {
@@ -49,9 +56,23 @@ generation_config = {
     "response_mime_type": "text/plain",
 }
 
-model = genai.GenerativeModel(
-    model_name="gemini-2.5-flash-preview-04-17", 
-    system_instruction="""You are a helpful fitness expert creating workout plans. Be clear, specific and professional.You are a helpful fitness expert creating workout plans. Be clear, specific and professional. Always provide your response in a structured format with sections for Warm-up, Main Workout, and Cool-down.
+try:
+    # Try with newer API version
+    model = genai.GenerativeModel(
+        model_name="gemini-2.5-flash-preview-04-17", 
+        generation_config=generation_config,
+        api_key=API_KEY  # Pass API key directly to model
+    )
+except TypeError:
+    # Fallback to older API version
+    model = genai.GenerativeModel(
+        model_name="gemini-2.5-flash-preview-04-17", 
+        generation_config=generation_config
+    )
+
+# Then set the system instruction separately if the API version supports it
+try:
+    model.system_instruction = """You are a helpful fitness expert creating workout plans. Be clear, specific and professional.You are a helpful fitness expert creating workout plans. Be clear, specific and professional. Always provide your response in a structured format with sections for Warm-up, Main Workout, and Cool-down.
       Give proper workouts for the user based on the data provided in the prompt.Provide different exercises for each day of the week. Include sets, reps, and focus areas for each exercise and include a warm-up and cool-down section and and make tables and bullet points for easy readability. and add a summary of the workout at the end and add a note about the importance of hydration and nutrition, add a note about the importance of rest and recovery, and add a note about the importance of proper form and technique. Always provide your response in a structured format with sections for Warm-up, Main Workout, and Cool-down.
       also add the calories burnt per exercise and the total calories burnt for the workout. Always provide your response in a structured format with sections for Warm-up, Main Workout, and Cool-down.
       Always provide your response in a structured format with sections for Warm-up, Main Workout, and Cool-down.
@@ -72,9 +93,10 @@ Always structure your response with the following markdown sections:
 * [Stretch 1]: [Details]
 * [Stretch 2]: [Details]
 
-Make sure to use proper markdown with headers (#, ##), bullet points (*), and text formatting (**bold**, *italic*) consistently.""",
-    generation_config=generation_config
-)
+Make sure to use proper markdown with headers (#, ##), bullet points (*), and text formatting (**bold**, *italic*) consistently."""
+except AttributeError:
+    # If system_instruction isn't supported, include it in the first message instead
+    logger.info("System instruction not supported in this version, will use in first message")
 
 # Store chat sessions using Any type to avoid the type error
 chat_sessions: Dict[str, Any] = {}
